@@ -8,6 +8,7 @@
 class UCapsuleComponent;
 class USpringArmComponent;
 class UCameraComponent;
+struct FInputActionValue;
 
 UCLASS()
 class HOMEWORK_07_API AMyPawn : public APawn
@@ -17,17 +18,21 @@ class HOMEWORK_07_API AMyPawn : public APawn
 public:
 	AMyPawn();
 
-	UCapsuleComponent* CapsuleComponent
-		= CreateDefaultSubobject<UCapsuleComponent>(TEXT("RootComponent"));
-	USkeletalMeshComponent* SkeletalMeshComponent;
+	UCapsuleComponent* CapsuleComponent;
 	USpringArmComponent* SpringArmComponent;
 	UCameraComponent* CameraComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SkeletalMesh")
+	USkeletalMeshComponent* SkeletalMeshComponent;
+
 protected:
 	virtual void BeginPlay() override;
-
-private:	
 	virtual void Tick(float DeltaTime) override;
-
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void MoveForward(float Value);
+
+private:
+	float MoveSpeed;
+	float ForwardInput;
+	FVector Direction;
 };
