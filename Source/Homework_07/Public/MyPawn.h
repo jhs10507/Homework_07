@@ -18,8 +18,11 @@ class HOMEWORK_07_API AMyPawn : public APawn
 public:
 	AMyPawn();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SceneRoot")
 	UCapsuleComponent* CapsuleComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SpringArm")
 	USpringArmComponent* SpringArmComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
 	UCameraComponent* CameraComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SkeletalMesh")
