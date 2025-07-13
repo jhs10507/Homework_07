@@ -1,9 +1,12 @@
 #include "MyPawn.h"
 #include "UObject/ConstructorHelpers.h"
+#include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Character.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "MyPlayerController.h"
+#include "Components/CapsuleComponent.h"
 
 AMyPawn::AMyPawn()
 {
@@ -42,25 +45,35 @@ AMyPawn::AMyPawn()
 	SkeletalMeshComponent->AddLocalOffset(FVector(0.0f, 0.0f, -90.0f));
 
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 void AMyPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
-
 
 void AMyPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AMyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		if (AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetController()))
+		{
+
+		}
+	}
 }
 
+void AMyPawn::Move(const FInputActionValue& value)
+{
+}
+
+void AMyPawn::Look(const FInputActionValue& value)
+{
+}
