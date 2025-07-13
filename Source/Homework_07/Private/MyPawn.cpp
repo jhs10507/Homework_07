@@ -65,7 +65,19 @@ void AMyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	{
 		if (AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetController()))
 		{
+			if (PlayerController->MoveAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->MoveAction,
+					ETriggerEvent::Triggered,
+					this,
+					&AMyPawn::Move
+				);
+			}
+			if (PlayerController->LookAction)
+			{
 
+			}
 		}
 	}
 }
