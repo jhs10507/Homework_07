@@ -20,15 +20,15 @@ AMyPawn::AMyPawn()
 	CameraComponent->bUsePawnControlRotation = false;
 
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshAsset(TEXT(
 		"/Game/Resources/Characters/Meshes/SKM_Manny.SKM_Manny"));
 	if (MeshAsset.Succeeded())
 	{
 		SkeletalMeshComponent->SetSkeletalMesh(MeshAsset.Object);
 	}
-
 	
+	FQuat SKMeshLocalRotation = FQuat(FRotator(0.0f, -90.0f, 0.0f));
+	SkeletalMeshComponent->AddLocalRotation(SKMeshLocalRotation);
 
 	PrimaryActorTick.bCanEverTick = true;
 
