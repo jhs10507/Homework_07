@@ -7,6 +7,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "MyPlayerController.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AMyPawn::AMyPawn()
 {
@@ -76,7 +77,12 @@ void AMyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 			}
 			if (PlayerController->LookAction)
 			{
-
+				EnhancedInput->BindAction(
+					PlayerController->LookAction,
+					ETriggerEvent::Triggered,
+					this,
+					&AMyPawn::Look
+				);
 			}
 		}
 	}
@@ -84,8 +90,25 @@ void AMyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AMyPawn::Move(const FInputActionValue& value)
 {
+	if (!Controller) return;
+
+	const FVector2D MoveInput = value.Get<FVector2D>();
+
+	if (!FMath::IsNearlyZero(MoveInput.X))
+	{
+		AddMovementInput(GetActorForwardVector(), MoveInput.X);
+	}
+
+	if (!FMath::IsNearlyZero(MoveInput.Y))
+	{
+		AddMovementInput(GetActorForwardVector(), MoveInput.Y);
+	}
 }
 
 void AMyPawn::Look(const FInputActionValue& value)
 {
+	FVector2D LookInput = value.Get<FVector2D>();
+
+	AddControllerYawInput(LookInput.X);
+	AddControllerPitchInput(LookInput.Y);
 }

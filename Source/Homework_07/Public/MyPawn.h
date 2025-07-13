@@ -20,7 +20,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SceneRoot")
 	UCapsuleComponent* CapsuleComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SpringArm")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
 	USpringArmComponent* SpringArmComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
 	UCameraComponent* CameraComponent;
@@ -37,10 +37,4 @@ protected:
 	void Move(const FInputActionValue& value);
 	UFUNCTION()
 	void Look(const FInputActionValue& value);
-	//void MoveForward(float Value);
-
-private:
-	/*float MoveSpeed;
-	float ForwardInput;
-	FVector Direction;*/
 };
