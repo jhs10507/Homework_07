@@ -89,7 +89,7 @@ void AMyPawn::Move(const FInputActionValue& value)
 	if (!Controller) return;
 
 	const FVector2D MoveInput = value.Get<FVector2D>();
-	float MoveSpeed = 10.f;
+	float MoveSpeed = 20.f;
 
 	if (!FMath::IsNearlyZero(MoveInput.X))
 	{
@@ -99,15 +99,15 @@ void AMyPawn::Move(const FInputActionValue& value)
 			float DeltaSeconds = GetWorld()->GetDeltaSeconds();
 			FVector LeftMovement = (LeftMove * MoveInput.X) * MoveSpeed * DeltaSeconds;
 			AddActorLocalOffset(LeftMovement);
-			UE_LOG(LogTemp, Warning, TEXT("좌측면"));
+
 		}
 		else
 		{
-			FVector RightMove = FVector(-10.f, 0.f, 0.f);
+			FVector RightMove = FVector(10.f, 0.f, 0.f);
 			float DeltaSeconds = GetWorld()->GetDeltaSeconds();
 			FVector RightMovement = (RightMove * MoveInput.X) * MoveSpeed * DeltaSeconds;
 			AddActorLocalOffset(RightMovement);
-			UE_LOG(LogTemp, Warning, TEXT("우측면"));
+
 		}
 		//AddMovementInput(GetActorForwardVector(), MoveInput.X);
 	}
@@ -120,15 +120,14 @@ void AMyPawn::Move(const FInputActionValue& value)
 			float DeltaSeconds = GetWorld()->GetDeltaSeconds();
 			FVector FrontMovement = (FrontMove * MoveInput.Y) * MoveSpeed * DeltaSeconds;
 			AddActorLocalOffset(FrontMovement);
-			UE_LOG(LogTemp, Warning, TEXT("정면"));
+			
 		}
 		else
 		{
-			FVector BackMove = FVector(0.f, -10.f, 0.f);
+			FVector BackMove = FVector(0.f, 10.f, 0.f);
 			float DeltaSeconds = GetWorld()->GetDeltaSeconds();
 			FVector BackMovement = (BackMove * MoveInput.Y) * MoveSpeed * DeltaSeconds;
 			AddActorLocalOffset(BackMovement);
-			UE_LOG(LogTemp, Warning, TEXT("후면"));
 		}
 		//AddMovementInput(GetActorForwardVector(), MoveInput.Y);
 	}
