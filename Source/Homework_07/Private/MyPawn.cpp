@@ -11,63 +11,37 @@
 
 AMyPawn::AMyPawn()
 {
-	//CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RootComponent"));
-	//RootComponent = CapsuleComponent;
-	//CapsuleComponent->AddLocalOffset(FVector(0.0f, 0.0f, 90.0f));
-	//CapsuleComponent->InitCapsuleSize(35.0f, 90.0f); // 캡슐의 높이와 반경 값을 조절함 (실제 크기 변경이 아님)
-	//CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
-	//
-	//SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	//SpringArmComponent->SetupAttachment(RootComponent);
-	//SpringArmComponent->AddLocalOffset(FVector(0.0f, 0.0f, 80.0f));
-	//SpringArmComponent->TargetArmLength = 300.0f;
-	//SpringArmComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
-	//SpringArmComponent->bUsePawnControlRotation = true;
-	//SpringArmComponent->SocketOffset = FVector(0.0f, 40.0f, 0.0f);
-	//
-	//CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	//CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
-	//CameraComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
-	//CameraComponent->SetFieldOfView(45.0f);
-	//CameraComponent->bUsePawnControlRotation = false;
-
-	//SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-	//static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshAsset(TEXT(
-	//	"/Game/Resources/Characters/Meshes/SKM_Manny.SKM_Manny"));
-	//if (MeshAsset.Succeeded())
-	//{
-	//	SkeletalMeshComponent->SetSkeletalMesh(MeshAsset.Object);
-	//}
-	//
-	//FQuat SKMeshLocalRotation = FQuat(FRotator(0.0f, -90.0f, 0.0f));
-	//SkeletalMeshComponent->AddLocalRotation(SKMeshLocalRotation);
-	//SkeletalMeshComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
-	//SkeletalMeshComponent->SetupAttachment(RootComponent);
-	//SkeletalMeshComponent->AddLocalOffset(FVector(0.0f, 0.0f, -90.0f));
-
-	// 1) Capsule Component: 루트 컴포넌트로 사용 (충돌, 이동 기준)
-	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComp"));
+	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
 	RootComponent = CapsuleComponent;
-	CapsuleComponent->InitCapsuleSize(34.f, 88.f);
+	CapsuleComponent->InitCapsuleSize(35.f, 90.f); // 캡슐의 높이와 반경 값을 조절함 (실제 크기 변경이 아님)
 	CapsuleComponent->SetSimulatePhysics(false);
+	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
 
-	// 2) Skeletal Mesh: Pawn의 외형 표현
-	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComp"));
+	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshAsset(TEXT(
+		"/Game/Resources/Characters/Meshes/SKM_Manny.SKM_Manny"));
+	if (MeshAsset.Succeeded())
+	{
+		SkeletalMeshComponent->SetSkeletalMesh(MeshAsset.Object);
+	}
+	
+	FQuat SKMeshLocalRotation = FQuat(FRotator(0.0f, -90.0f, 0.0f));
+	SkeletalMeshComponent->AddLocalRotation(SKMeshLocalRotation);
 	SkeletalMeshComponent->SetupAttachment(CapsuleComponent);
+	SkeletalMeshComponent->AddLocalOffset(FVector(0.0f, 0.0f, -90.0f));
 	SkeletalMeshComponent->SetSimulatePhysics(false);
 
-	// 3) SpringArm: 카메라의 거리를 제어하며, 회전도 가능하도록 설정
-	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
+	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArmComponent->SetupAttachment(CapsuleComponent);
-	SpringArmComponent->TargetArmLength = 300.f;
-	// Pawn의 회전과 별개로 카메라가 독립적으로 회전하도록 함
+	SpringArmComponent->AddLocalOffset(FVector(0.0f, 0.0f, 80.0f));
+	SpringArmComponent->TargetArmLength = 300.0f;
 	SpringArmComponent->bUsePawnControlRotation = false;
 
-	// 4) Camera: 실제 화면에 보일 카메라
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
-	CameraComponent->SetupAttachment(SpringArmComponent);
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
+	CameraComponent->SetFieldOfView(45.0f);
 
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 void AMyPawn::BeginPlay()
@@ -115,23 +89,47 @@ void AMyPawn::Move(const FInputActionValue& value)
 	if (!Controller) return;
 
 	const FVector2D MoveInput = value.Get<FVector2D>();
+	float MoveSpeed = 10.f;
 
 	if (!FMath::IsNearlyZero(MoveInput.X))
 	{
-		if (MoveInput.X < 0)
+		if (!FMath::IsNegative(MoveInput.X))
 		{
-			AddActorLocalOffset(FVector(1.0f, 0.0f, 0.0f));
+			FVector LeftMove = FVector(10.f, 0.f, 0.f);
+			float DeltaSeconds = GetWorld()->GetDeltaSeconds();
+			FVector LeftMovement = (LeftMove * MoveInput.X) * MoveSpeed * DeltaSeconds;
+			AddActorLocalOffset(LeftMovement);
+			UE_LOG(LogTemp, Warning, TEXT("좌측면"));
 		}
-		else if (MoveInput.X > 0)
+		else
 		{
-			AddActorLocalOffset(FVector(-1.0f, 0.0f, 0.0f));
+			FVector RightMove = FVector(-10.f, 0.f, 0.f);
+			float DeltaSeconds = GetWorld()->GetDeltaSeconds();
+			FVector RightMovement = (RightMove * MoveInput.X) * MoveSpeed * DeltaSeconds;
+			AddActorLocalOffset(RightMovement);
+			UE_LOG(LogTemp, Warning, TEXT("우측면"));
 		}
 		//AddMovementInput(GetActorForwardVector(), MoveInput.X);
 	}
 
 	if (!FMath::IsNearlyZero(MoveInput.Y))
 	{
-		AddActorLocalOffset(FVector(0.0f, 1.0f, 0.0f));
+		if (!FMath::IsNegative(MoveInput.Y))
+		{
+			FVector FrontMove = FVector(0.f, 10.f, 0.f);
+			float DeltaSeconds = GetWorld()->GetDeltaSeconds();
+			FVector FrontMovement = (FrontMove * MoveInput.Y) * MoveSpeed * DeltaSeconds;
+			AddActorLocalOffset(FrontMovement);
+			UE_LOG(LogTemp, Warning, TEXT("정면"));
+		}
+		else
+		{
+			FVector BackMove = FVector(0.f, -10.f, 0.f);
+			float DeltaSeconds = GetWorld()->GetDeltaSeconds();
+			FVector BackMovement = (BackMove * MoveInput.Y) * MoveSpeed * DeltaSeconds;
+			AddActorLocalOffset(BackMovement);
+			UE_LOG(LogTemp, Warning, TEXT("후면"));
+		}
 		//AddMovementInput(GetActorForwardVector(), MoveInput.Y);
 	}
 }
@@ -139,7 +137,6 @@ void AMyPawn::Move(const FInputActionValue& value)
 void AMyPawn::Look(const FInputActionValue& value)
 {
 	FVector2D LookInput = value.Get<FVector2D>();
-	//UCameraComponent* camera = CameraComponent;
 	
 	// SpringArmComponent가 null이 아닐 경우에만 실행
 	if (SpringArmComponent)
@@ -161,7 +158,7 @@ void AMyPawn::Look(const FInputActionValue& value)
 			PithRotation = FMath::Clamp(PithRotation, -60.f, 80.f);
 			CurrentRotation.Pitch = PithRotation;
 			SpringArmComponent->SetRelativeRotation(CurrentRotation);
-			UE_LOG(LogTemp, Warning, TEXT("회전"));
+			//UE_LOG(LogTemp, Warning, TEXT("회전"));
 		}
 	}
 }
