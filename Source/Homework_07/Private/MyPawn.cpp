@@ -93,7 +93,12 @@ void AMyPawn::Move(const FInputActionValue& value)
 
 	if (!FMath::IsNearlyZero(MoveInput.X))
 	{
-		if (!FMath::IsNegative(MoveInput.X))
+		FVector SideMove = FVector(10.f, 0.f, 0.f);
+		float DeltaSeconds = GetWorld()->GetDeltaSeconds();
+		FVector SideMovement = (SideMove * MoveInput.X) * MoveSpeed * DeltaSeconds;
+		AddActorLocalOffset(SideMovement);
+
+		/*if (!FMath::IsNegative(MoveInput.X))
 		{
 			FVector LeftMove = FVector(10.f, 0.f, 0.f);
 			float DeltaSeconds = GetWorld()->GetDeltaSeconds();
@@ -108,8 +113,8 @@ void AMyPawn::Move(const FInputActionValue& value)
 			FVector RightMovement = (RightMove * MoveInput.X) * MoveSpeed * DeltaSeconds;
 			AddActorLocalOffset(RightMovement);
 
-		}
-		//AddMovementInput(GetActorForwardVector(), MoveInput.X);
+		}*/
+		//AddMovementInput(GetActorForwardVector(), MoveInput.X); 사용하지 않았을 때의 코드
 	}
 
 	if (!FMath::IsNearlyZero(MoveInput.Y))
@@ -129,7 +134,7 @@ void AMyPawn::Move(const FInputActionValue& value)
 			FVector BackMovement = (BackMove * MoveInput.Y) * MoveSpeed * DeltaSeconds;
 			AddActorLocalOffset(BackMovement);
 		}
-		//AddMovementInput(GetActorForwardVector(), MoveInput.Y);
+		//AddMovementInput(GetActorForwardVector(), MoveInput.Y); 사용하지 않았을 때의 코드
 	}
 }
 
