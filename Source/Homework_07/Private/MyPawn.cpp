@@ -88,8 +88,8 @@ void AMyPawn::Move(const FInputActionValue& value)
 {
 	if (!Controller) return;
 
-	const FVector2D MoveInput = value.Get<FVector2D>();
-	float MoveSpeed = 20.f;
+	const FVector MoveInput = value.Get<FVector>();
+	float MoveSpeed = 30.f;
 
 	if (!FMath::IsNearlyZero(MoveInput.X))
 	{
@@ -98,49 +98,31 @@ void AMyPawn::Move(const FInputActionValue& value)
 		FVector SideMovement = (SideMove * MoveInput.X) * MoveSpeed * DeltaSeconds;
 		AddActorLocalOffset(SideMovement);
 
-		/*if (!FMath::IsNegative(MoveInput.X))
-		{
-			FVector LeftMove = FVector(10.f, 0.f, 0.f);
-			float DeltaSeconds = GetWorld()->GetDeltaSeconds();
-			FVector LeftMovement = (LeftMove * MoveInput.X) * MoveSpeed * DeltaSeconds;
-			AddActorLocalOffset(LeftMovement);
-
-		}
-		else
-		{
-			FVector RightMove = FVector(10.f, 0.f, 0.f);
-			float DeltaSeconds = GetWorld()->GetDeltaSeconds();
-			FVector RightMovement = (RightMove * MoveInput.X) * MoveSpeed * DeltaSeconds;
-			AddActorLocalOffset(RightMovement);
-
-		}*/
 		//AddMovementInput(GetActorForwardVector(), MoveInput.X); 사용하지 않았을 때의 코드
 	}
 
 	if (!FMath::IsNearlyZero(MoveInput.Y))
 	{
-		if (!FMath::IsNegative(MoveInput.Y))
-		{
-			FVector FrontMove = FVector(0.f, 10.f, 0.f);
-			float DeltaSeconds = GetWorld()->GetDeltaSeconds();
-			FVector FrontMovement = (FrontMove * MoveInput.Y) * MoveSpeed * DeltaSeconds;
-			AddActorLocalOffset(FrontMovement);
-			
-		}
-		else
-		{
-			FVector BackMove = FVector(0.f, 10.f, 0.f);
-			float DeltaSeconds = GetWorld()->GetDeltaSeconds();
-			FVector BackMovement = (BackMove * MoveInput.Y) * MoveSpeed * DeltaSeconds;
-			AddActorLocalOffset(BackMovement);
-		}
+		FVector FrontMove = FVector(0.f, 10.f, 0.f);
+		float DeltaSeconds = GetWorld()->GetDeltaSeconds();
+		FVector FrontMovement = (FrontMove * MoveInput.Y) * MoveSpeed * DeltaSeconds;
+		AddActorLocalOffset(FrontMovement);
+
 		//AddMovementInput(GetActorForwardVector(), MoveInput.Y); 사용하지 않았을 때의 코드
+	}
+
+	if (!FMath::IsNearlyZero(MoveInput.Z))
+	{
+		FVector UpMove = FVector(0.f, 0.f, 10.f);
+		float DeltaSeconds = GetWorld()->GetDeltaSeconds();
+		FVector UpMovement = (UpMove * MoveInput.Z) * MoveSpeed * DeltaSeconds;
+		AddActorLocalOffset(UpMovement);
 	}
 }
 
 void AMyPawn::Look(const FInputActionValue& value)
 {
-	FVector2D LookInput = value.Get<FVector2D>();
+	FVector LookInput = value.Get<FVector>();
 	
 	// SpringArmComponent가 null이 아닐 경우에만 실행
 	if (SpringArmComponent)
@@ -163,6 +145,13 @@ void AMyPawn::Look(const FInputActionValue& value)
 			CurrentRotation.Pitch = PithRotation;
 			SpringArmComponent->SetRelativeRotation(CurrentRotation);
 			//UE_LOG(LogTemp, Warning, TEXT("회전"));
+		}
+		if (!FMath::IsNearlyZero(LookInput.Z))
+		{
+			//AddControllerYawInput(LookInput.X); 를 사용하지 않았을 때
+			// 마우스의 좌우 입력이 들어왔을 때
+			float RollRotation = LookInput.Z * GetWorld()->GetDeltaSeconds() * 100.f;
+			AddActorLocalRotation(FRotator(0.0f, 0.0f, RollRotation)); // Pitch, Yaw, Roll
 		}
 	}
 }
