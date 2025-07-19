@@ -2,7 +2,7 @@
 #include "EnhancedInputSubsystems.h"
 
 AMyPlayerController::AMyPlayerController() 
-	: InputMappingContext(nullptr), MoveAction(nullptr), LookAction(nullptr)
+	: InputMappingContext(nullptr), MoveAction(nullptr), LookAction(nullptr), JumpAction(nullptr)
 {
 }
 
